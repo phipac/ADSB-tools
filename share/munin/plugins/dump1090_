@@ -25,9 +25,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Update 2024/06/11 by Phipac - vincenty no longer supported
+# Replaced with geodesic
 
 import collections
-from geopy.distance import vincenty
+from geopy.distance import geodesic
 import json
 from math import radians, cos, sin, asin, sqrt
 import os
@@ -171,11 +174,11 @@ def do_fetch( which ):
     Output recorded Munin data
     """
     if which == 'ac':
-        # Read statistics and receiver location; altitude is set at top of file
+        # Read statistics and receiver location; altitude is set at top of file but no longer supported (2024/06/11)
         with open( RECVR_FILE ) as f:
             receiver = json.load( f )
         n_hist = int( receiver['history'] )
-        rx_pos = (receiver['lat'], receiver['lon'], RX_ALT_KM,)
+        rx_pos = (receiver['lat'], receiver['lon'])
         data = []
         for i in range( n_hist ):
             fn = os.path.join( JSON_DATA, 'history_%s.json' % (i,) )
@@ -199,7 +202,7 @@ def do_fetch( which ):
                     ac_n_pos[ac['hex']]['alt_e'] = ac['nav_altitude_mcp']
 
                     try:
-                        d = vincenty( rx_pos, (ac['lat'], ac['lon'], ac['nav_altitude_mcp'] * KM_PER_FT,) ).nm
+                        d = geodesic(rx_pos, (ac['lat'], ac['lon'])).nm)
                     except TypeError:
                         print >>sys.stderr, "couldn't calc distance for a/c at lat %s (%s) lon %s (%s) alt %s (%s) " % (ac['lat'], type(ac['lat']),
                                         ac['lon'], type(ac['lon']),
