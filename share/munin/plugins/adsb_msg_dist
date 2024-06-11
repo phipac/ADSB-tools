@@ -21,11 +21,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Update 2024/06/11 by Phipac - vincenty no longer supported
+# Replaced with geodesic
 
 import collections
 import csv
 import datetime
-from geopy.distance import vincenty
+from geopy.distance import geodesic
 import logging
 import logging.handlers
 import math
@@ -179,7 +181,7 @@ def do_pos( last, delta, msg ):
 
     Return value is in feet adjusted for last-known ground speed in feet/sec.
     """
-    d = vincenty( last[msg.icao]['pos'], msg.pos ).nm
+    d = geodesic( last[msg.icao]['pos'], msg.pos ).nm
     nm_per_sec = last[msg.icao]['gs'] / 3600.0
     delta['pos'].append( d / nm_per_sec )
 
